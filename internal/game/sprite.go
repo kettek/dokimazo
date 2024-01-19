@@ -27,7 +27,7 @@ func (s *Sprite) SetZ(z float64) {
 	s.z = z
 }
 
-func (s *Sprite) Draw(screen *ebiten.Image, geom ebiten.GeoM) {
+func (s *Sprite) Draw(drawOpts DrawOpts) {
 	op := &ebiten.DrawImageOptions{}
 	op.Filter = ebiten.FilterLinear
 	// Rotate about center.
@@ -36,8 +36,8 @@ func (s *Sprite) Draw(screen *ebiten.Image, geom ebiten.GeoM) {
 	op.GeoM.Translate(s.HalfWidth(), s.HalfHeight())
 	// Translate to position.
 	op.GeoM.Translate(s.X(), s.Y())
-	op.GeoM.Concat(geom)
-	screen.DrawImage(s.Image.Image, op)
+	op.GeoM.Concat(drawOpts.GeoM)
+	drawOpts.Image.DrawImage(s.Image.Image, op)
 }
 
 func (s *Sprite) Position() Vec2 {

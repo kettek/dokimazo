@@ -17,8 +17,8 @@ func NewMover() *Mover {
 	}
 }
 
-func (m *Mover) Draw(screen *ebiten.Image, geom ebiten.GeoM) {
-	m.SpriteStack.Draw(screen, geom)
+func (m *Mover) Draw(drawOpts DrawOpts) {
+	m.SpriteStack.Draw(drawOpts)
 }
 
 func (m *Mover) Update() {

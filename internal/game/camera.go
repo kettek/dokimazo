@@ -57,38 +57,38 @@ func (c *Camera) Update() error {
 	return nil
 }
 
-func (c *Camera) Draw(screen *ebiten.Image, visuals []Visual) {
-	tx, ty := c.X(), c.Y()
-	ox, oy := c.W/2, c.H/2
+func (c *Camera) Draw(screen *ebiten.Image, visuals Visuals) {
+	t := Vec2{c.X(), c.Y()}
+	o := Vec2{c.W / 2, c.H / 2}
 	if c.Target != nil {
 		p := c.Target.Position()
 		s := c.Target.Size()
-		tx, ty = p.X()+s.X()/2, p.Y()+s.Y()/2
+		t = Vec2{p.X() + s.X()/2, p.Y() + s.Y()/2}
 	}
 
 	// Sort visuals by their position with respect to the camera rotation.
-	if c.sortNext {
-		sort.Slice(visuals, func(i, j int) bool {
-			p1, p2 := visuals[i].Position(), visuals[j].Position()
-			p1z, p2z := visuals[i].Z(), visuals[j].Z()
-			p1.Rotate(-c.Angle())
-			p2.Rotate(-c.Angle())
-			p1.Add(Vec2{p1z, p1z})
-			p2.Add(Vec2{p2z, p2z})
-			return p1.Y() < p2.Y()
-		})
-		c.sortNext = false
-	}
+	sort.Slice(visuals, func(i, j int) bool {
+		p1, p2 := visuals[i].Position(), visuals[j].Position()
+		p1.RotateAround(t, -c.Angle())
+		p2.RotateAround(t, -c.Angle())
+		return p1.Y()+visuals[i].Z() < p2.Y()+visuals[j].Z()
+	})
 
 	g := ebiten.GeoM{}
 
-	g.Translate(-tx, -ty)
+	g.Translate(-t.X(), -t.Y())
 	g.Rotate(-c.Angle())
-	g.Translate(ox, oy)
+	g.Scale(c.Z, c.Z)
+	g.Translate(o.X(), o.Y())
 
 	c.image.Clear()
+	drawOpts := DrawOpts{
+		Image: screen,
+		GeoM:  g,
+		Z:     c.Z,
+	}
 	for _, v := range visuals {
-		v.Draw(c.image, g)
+		v.Draw(drawOpts)
 	}
 	screen.DrawImage(c.image, nil)
 }

@@ -2,8 +2,6 @@ package game
 
 import (
 	"rotate-test/internal/res"
-
-	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Static struct {
@@ -16,8 +14,8 @@ func NewStatic() *Static {
 	}
 }
 
-func (s *Static) Draw(screen *ebiten.Image, geom ebiten.GeoM) {
-	s.Sprite.Draw(screen, geom)
+func (s *Static) Draw(drawOpts DrawOpts) {
+	s.Sprite.Draw(drawOpts)
 }
 
 func (s *Static) Update() {

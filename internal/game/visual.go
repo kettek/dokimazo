@@ -1,9 +1,7 @@
 package game
 
-import "github.com/hajimehoshi/ebiten/v2"
-
 type Visual interface {
-	Draw(screen *ebiten.Image, geom ebiten.GeoM)
+	Draw(ops DrawOpts)
 	Position() Vec2
 	Size() Vec2
 	Angle() float64

@@ -38,8 +38,10 @@ func (v *Vec2) Mul(v2 Vec2) *Vec2 {
 
 func (v *Vec2) Rotate(angle float64) *Vec2 {
 	sin, cos := math.Sincos(angle)
-	v[0] = v[0]*cos - v[1]*sin
-	v[1] = v[0]*sin + v[1]*cos
+	x := v[0]*cos - v[1]*sin
+	y := v[0]*sin + v[1]*cos
+	v[0] = x
+	v[1] = y
 	return v
 }
 

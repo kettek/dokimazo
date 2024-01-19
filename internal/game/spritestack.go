@@ -38,7 +38,7 @@ func (s *SpriteStack) SetZ(z float64) {
 	s.z = z
 }
 
-func (s *SpriteStack) Draw(screen *ebiten.Image, geom ebiten.GeoM) {
+func (s *SpriteStack) Draw(drawOpts DrawOpts) {
 	op := &ebiten.DrawImageOptions{}
 	op.Filter = ebiten.FilterLinear
 	// Rotate about center.
@@ -47,10 +47,10 @@ func (s *SpriteStack) Draw(screen *ebiten.Image, geom ebiten.GeoM) {
 	op.GeoM.Translate(s.HalfWidth(), s.HalfHeight())
 	// Translate to position.
 	op.GeoM.Translate(s.X(), s.Y())
-	op.GeoM.Concat(geom)
+	op.GeoM.Concat(drawOpts.GeoM)
 	for col := 0; col < s.ImageSheet.Cols(); col++ {
-		screen.DrawImage(s.ImageSheet.At(col, 0), op)
-		op.GeoM.Translate(0, -s.LayerDistance)
+		drawOpts.Image.DrawImage(s.ImageSheet.At(col, 0), op)
+		op.GeoM.Translate(0, -s.LayerDistance*drawOpts.Z)
 	}
 }
 
