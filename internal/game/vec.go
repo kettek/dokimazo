@@ -47,6 +47,14 @@ func (v *Vec2) RotateAround(origin Vec2, angle float64) *Vec2 {
 	return v.Sub(origin).Rotate(angle).Add(origin)
 }
 
+func (v *Vec2) Distance(v2 Vec2) float64 {
+	return math.Sqrt(math.Pow(v[0]-v2[0], 2) + math.Pow(v[1]-v2[1], 2))
+}
+
+func (v *Vec2) AngleTo(v2 Vec2) float64 {
+	return math.Atan2(v2[1]-v[1], v2[0]-v[0])
+}
+
 type RVec2 struct {
 	Vec2
 	angle float64
