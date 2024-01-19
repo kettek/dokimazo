@@ -10,3 +10,18 @@ type Visual interface {
 	Z() float64
 	SetZ(float64)
 }
+
+type Visuals []Visual
+
+func (v *Visuals) Add(visual Visual) {
+	*v = append(*v, visual)
+}
+
+func (v *Visuals) Remove(visual Visual) {
+	for i, visual2 := range *v {
+		if visual2 == visual {
+			*v = append((*v)[:i], (*v)[i+1:]...)
+			return
+		}
+	}
+}

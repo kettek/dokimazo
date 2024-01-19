@@ -9,12 +9,14 @@ import (
 
 type Game struct {
 	camera  Camera
-	visuals []Visual
-	things  []Thing
+	visuals Visuals
+	things  Things
 }
 
 func New() *Game {
-	c := NewCamera()
+	g := &Game{
+		camera: *NewCamera(),
+	}
 
 	var statics []*Static
 
@@ -28,16 +30,14 @@ func New() *Game {
 		}
 	}
 
-	var visuals []Visual
 	for _, s := range statics {
-		visuals = append(visuals, s)
+		g.visuals.Add(s)
 	}
 
 	{
 		c := NewSpriteStackFromImageSheet(res.NewImageSheet(res.MustLoadImage("palisade.png"), 16, 16))
 		c.Rotate(math.Pi / 2)
 		c.SetZ(10000)
-		visuals = append(visuals, c)
 
 		for i := 0; i < 10; i++ {
 			if i > 0 && i < 9 {
@@ -46,22 +46,19 @@ func New() *Game {
 			for j := 0; j < 10; j++ {
 				nc := c.Clone()
 				nc.Assign(Vec2{float64(i) * nc.HalfWidth() * 2, float64(j) * nc.HalfWidth() * 2})
-				visuals = append(visuals, nc)
+				g.visuals.Add(nc)
 			}
 		}
 	}
 
 	m := NewMover()
 	m.Assign(Vec2{200, 200})
-	visuals = append(visuals, m)
+	g.visuals.Add(m)
+	g.things.Add(m)
 
-	c.Target = m
+	g.camera.Target = m
 
-	return &Game{
-		camera:  *c,
-		visuals: visuals,
-		things:  []Thing{m},
-	}
+	return g
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
