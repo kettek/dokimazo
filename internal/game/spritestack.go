@@ -1,6 +1,7 @@
 package game
 
 import (
+	"image/color"
 	"rotate-test/internal/res"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -49,6 +50,10 @@ func (s *SpriteStack) Draw(drawOpts DrawOpts) {
 	op.GeoM.Translate(s.X(), s.Y())
 	op.GeoM.Concat(drawOpts.GeoM)
 	for col := 0; col < s.ImageSheet.Cols(); col++ {
+		op.ColorScale.Reset()
+		r := float64(col) / float64(s.ImageSheet.Cols())
+		c := uint8(150.0 + 105*r)
+		op.ColorScale.ScaleWithColor(color.NRGBA{c, c, c, 255})
 		drawOpts.Image.DrawImage(s.ImageSheet.At(col, 0), op)
 		op.GeoM.Translate(0, -s.LayerDistance*drawOpts.Z)
 	}
