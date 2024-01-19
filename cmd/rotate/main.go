@@ -9,6 +9,8 @@ import (
 func main() {
 	g := game.New()
 
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
+
 	if err := ebiten.RunGame(g); err != nil {
 		panic(err)
 	}
