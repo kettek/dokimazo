@@ -36,6 +36,7 @@ func New() *Game {
 
 	{
 		c := NewSpriteStackFromImageSheet(res.NewImageSheet(res.MustLoadImage("palisade.png"), 16, 16))
+		c.LayerDistance = 2
 		c.Rotate(math.Pi / 2)
 		c.SetZ(10000)
 
@@ -52,6 +53,7 @@ func New() *Game {
 	}
 
 	m := NewMover()
+	m.SetZ(10000)
 	m.Assign(Vec2{200, 200})
 	g.visuals.Add(m)
 	g.things.Add(m)

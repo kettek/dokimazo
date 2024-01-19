@@ -43,10 +43,10 @@ func (c *Camera) updateImage() {
 
 func (c *Camera) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
-		c.Rotate(0.01)
+		c.Rotate(0.02)
 		c.sortNext = true
 	} else if ebiten.IsKeyPressed(ebiten.KeyE) {
-		c.Rotate(-0.01)
+		c.Rotate(-0.02)
 		c.sortNext = true
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyZ) {

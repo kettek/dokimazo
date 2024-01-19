@@ -39,6 +39,10 @@ func (i *ImageSheet) Cols() int {
 	return i.cols
 }
 
+func (i *ImageSheet) Bounds() image.Rectangle {
+	return image.Rect(0, 0, i.cw, i.ch)
+}
+
 func NewImageSheet(image *Image, cellw, cellh int) *ImageSheet {
 	bounds := image.Bounds()
 	w, h := bounds.Size().X, bounds.Size().Y

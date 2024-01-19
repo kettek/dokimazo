@@ -9,21 +9,24 @@ import (
 type SpriteStack struct {
 	RVec2
 	*res.ImageSheet
-	z float64
+	LayerDistance float64
+	z             float64
 }
 
 func NewSpriteStackFromImageSheet(imagesheet *res.ImageSheet) *SpriteStack {
 	return &SpriteStack{
-		ImageSheet: imagesheet,
-		z:          1,
+		ImageSheet:    imagesheet,
+		LayerDistance: 1,
+		z:             1,
 	}
 }
 
 func (s *SpriteStack) Clone() *SpriteStack {
 	return &SpriteStack{
-		RVec2:      s.RVec2,
-		ImageSheet: s.ImageSheet,
-		z:          s.z,
+		RVec2:         s.RVec2,
+		ImageSheet:    s.ImageSheet,
+		z:             s.z,
+		LayerDistance: s.LayerDistance,
 	}
 }
 
@@ -47,7 +50,7 @@ func (s *SpriteStack) Draw(screen *ebiten.Image, geom ebiten.GeoM) {
 	op.GeoM.Concat(geom)
 	for col := 0; col < s.ImageSheet.Cols(); col++ {
 		screen.DrawImage(s.ImageSheet.At(col, 0), op)
-		op.GeoM.Translate(0, -2)
+		op.GeoM.Translate(0, -s.LayerDistance)
 	}
 }
 

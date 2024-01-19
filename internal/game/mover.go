@@ -7,17 +7,18 @@ import (
 )
 
 type Mover struct {
-	*Sprite
+	*SpriteStack
 }
 
 func NewMover() *Mover {
 	return &Mover{
-		Sprite: NewSpriteFromImage(res.MustLoadImage("thing.png")),
+		//Sprite: NewSpriteFromImage(res.MustLoadImage("thing.png")),
+		SpriteStack: NewSpriteStackFromImageSheet(res.NewImageSheet(res.MustLoadImage("humus.png"), 16, 16)),
 	}
 }
 
 func (m *Mover) Draw(screen *ebiten.Image, geom ebiten.GeoM) {
-	m.Sprite.Draw(screen, geom)
+	m.SpriteStack.Draw(screen, geom)
 }
 
 func (m *Mover) Update() {
