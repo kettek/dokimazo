@@ -86,6 +86,7 @@ func (c *Camera) Draw(screen *ebiten.Image, visuals Visuals) {
 		Image: screen,
 		GeoM:  g,
 		Z:     c.Z,
+		Angle: c.Angle(),
 	}
 	for _, v := range visuals {
 		v.Draw(drawOpts)
