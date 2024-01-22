@@ -10,7 +10,7 @@ type Static struct {
 
 func NewStatic() *Static {
 	return &Static{
-		Sprite: NewSpriteFromImage(res.MustLoadImage("tile.png")),
+		Sprite: NewSpriteFromSheet(res.MustLoadSheetWithSize("tile.png", 20, 20)),
 	}
 }
 

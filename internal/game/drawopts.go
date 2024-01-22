@@ -8,3 +8,10 @@ type DrawOpts struct {
 	Z     float64
 	Angle float64
 }
+
+type DrawTargets struct {
+	Ground *ebiten.Image
+	Shadow *ebiten.Image
+	World  *ebiten.Image
+	Sky    *ebiten.Image
+}

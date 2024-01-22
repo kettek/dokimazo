@@ -1,0 +1,10 @@
+data:
+  id: wall:palisade
+  name: palisade
+  description: A wall made of spiked wood.
+visual:
+  image: wall/palisade
+  layer_distance: 2
+behavior:
+  blocks: true
+  hurts: true

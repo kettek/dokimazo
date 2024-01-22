@@ -9,6 +9,10 @@ type Visual interface {
 	SetZ(float64)
 }
 
+type VisualShadow interface {
+	DrawShadow(ops DrawOpts)
+}
+
 type Visuals []Visual
 
 func (v *Visuals) Add(visual Visual) {

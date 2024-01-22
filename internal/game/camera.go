@@ -6,6 +6,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+type CameraDrawOptions struct {
+	XOffset, YOffset float64
+	HideVisuals      bool
+	Shadows          bool
+}
+
 type Camera struct {
 	RVec2
 	W, H     float64
@@ -42,6 +48,12 @@ func (c *Camera) updateImage() {
 }
 
 func (c *Camera) Update() error {
+	if c.Target != nil {
+		p := c.Target.Position()
+		s := c.Target.Size()
+		p.Add(Vec2{s.X() / 2, s.Y() / 2})
+		c.Assign(p)
+	}
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		c.Rotate(0.02)
 		c.sortNext = true
@@ -57,17 +69,13 @@ func (c *Camera) Update() error {
 	return nil
 }
 
-func (c *Camera) Draw(screen *ebiten.Image, visuals Visuals) {
+func (c *Camera) Draw(screen *ebiten.Image, visuals Visuals, opts CameraDrawOptions) {
 	t := Vec2{c.X(), c.Y()}
 	o := Vec2{c.W / 2, c.H / 2}
-	if c.Target != nil {
-		p := c.Target.Position()
-		s := c.Target.Size()
-		t = Vec2{p.X() + s.X()/2, p.Y() + s.Y()/2}
-	}
+	t.Add(Vec2{opts.XOffset, opts.YOffset})
 
 	// Sort visuals by their position with respect to the camera rotation.
-	sort.Slice(visuals, func(i, j int) bool {
+	sort.SliceStable(visuals, func(i, j int) bool {
 		p1, p2 := visuals[i].Position(), visuals[j].Position()
 		p1.RotateAround(t, -c.Angle())
 		p2.RotateAround(t, -c.Angle())
@@ -88,8 +96,17 @@ func (c *Camera) Draw(screen *ebiten.Image, visuals Visuals) {
 		Z:     c.Z,
 		Angle: c.Angle(),
 	}
-	for _, v := range visuals {
-		v.Draw(drawOpts)
+	if opts.Shadows {
+		for _, v := range visuals {
+			if v, ok := v.(VisualShadow); ok {
+				v.DrawShadow(drawOpts)
+			}
+		}
+	}
+	if !opts.HideVisuals {
+		for _, v := range visuals {
+			v.Draw(drawOpts)
+		}
 	}
 	screen.DrawImage(c.image, nil)
 }

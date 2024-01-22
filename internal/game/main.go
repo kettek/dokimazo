@@ -1,81 +1,91 @@
 package game
 
 import (
-	"math"
-	"rotate-test/internal/res"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Game struct {
-	camera  Camera
-	visuals Visuals
-	things  Things
+	camera Camera
+
+	world World
+
+	players []*Player
+
+	//
+	drawTargets DrawTargets
+	//
+	lastWidth, lastHeight int
 }
 
 func New() *Game {
 	g := &Game{
 		camera: *NewCamera(),
+		world:  *NewWorld(),
 	}
 
-	var statics []*Static
+	chunk := g.world.LoadChunk(0, 0)
 
-	for i := 0; i < 10; i++ {
-		for j := 0; j < 10; j++ {
-			s := NewStatic()
-			s.Sprite = NewSpriteFromImage(res.MustLoadImage("dirt.png"))
-			s.Assign(Vec2{float64(i) * 16, float64(j) * 16})
-			s.SetZ(-10000)
-			statics = append(statics, s)
-		}
-	}
+	p := NewPlayer()
 
-	for _, s := range statics {
-		g.visuals.Add(s)
-	}
+	px, py := float64(chunk.X)*ChunkPixelSize*ChunkTileSize, float64(chunk.Y)*ChunkPixelSize*ChunkTileSize
+	p.Assign(Vec2{px, py})
+	chunk.AddThing(p, VisualLayerWorld)
 
-	{
-		c := NewSpriteStackFromImageSheet(res.NewImageSheet(res.MustLoadImage("palisade.png"), 16, 16))
-		c.LayerDistance = 2
-		c.Rotate(math.Pi / 2)
-		c.SetZ(10000)
+	g.players = append(g.players, p)
 
-		for i := 0; i < 10; i++ {
-			if i > 0 && i < 9 {
-				continue
-			}
-			for j := 0; j < 10; j++ {
-				nc := c.Clone()
-				nc.Assign(Vec2{float64(i) * nc.HalfWidth() * 2, float64(j) * nc.HalfWidth() * 2})
-				g.visuals.Add(nc)
-			}
-		}
-	}
-
-	m := NewMover()
-	m.SetZ(10000)
-	m.Assign(Vec2{200, 200})
-	g.visuals.Add(m)
-	g.things.Add(m)
-
-	g.camera.Target = m
+	g.camera.Target = p
 
 	return g
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	g.camera.Layout(outsideWidth, outsideHeight)
+	if g.lastWidth != outsideWidth || g.lastHeight != outsideHeight {
+		g.lastWidth, g.lastHeight = outsideWidth, outsideHeight
+		g.drawTargets.Ground = ebiten.NewImage(outsideWidth, outsideHeight)
+		g.drawTargets.Shadow = ebiten.NewImage(outsideWidth, outsideHeight)
+		g.drawTargets.World = ebiten.NewImage(outsideWidth, outsideHeight)
+		g.drawTargets.Sky = ebiten.NewImage(outsideWidth, outsideHeight)
+		g.camera.Layout(outsideWidth, outsideHeight)
+	}
 	return outsideWidth, outsideHeight
 }
 
 func (g *Game) Update() error {
-	g.camera.Update()
-	for _, t := range g.things {
-		t.Update()
+	if err := g.world.Update(); err != nil {
+		return err
 	}
+	g.camera.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.camera.Draw(screen, g.visuals)
+	px, py := g.LocalPlayer().Chunk().X, g.LocalPlayer().Chunk().Y
+	chunks := g.world.ChunksAround(px, py)
+
+	// Collect visuals to render.
+	var lowVisuals, medVisuals, skyVisuals Visuals
+	for _, chunk := range chunks {
+		lowVisuals = append(lowVisuals, chunk.lowVisuals...)
+		medVisuals = append(medVisuals, chunk.medVisuals...)
+		skyVisuals = append(skyVisuals, chunk.highVisuals...)
+	}
+
+	g.drawTargets.Ground.Clear()
+	g.drawTargets.Shadow.Clear()
+	g.drawTargets.World.Clear()
+	g.drawTargets.Sky.Clear()
+
+	g.camera.Draw(g.drawTargets.Ground, lowVisuals, CameraDrawOptions{})
+	//g.camera.Draw(g.drawTargets.Shadow, medVisuals, CameraDrawOptions{Shadows: true, HideVisuals: true})
+	g.camera.Draw(g.drawTargets.World, medVisuals, CameraDrawOptions{Shadows: true})
+	g.camera.Draw(g.drawTargets.Sky, skyVisuals, CameraDrawOptions{})
+
+	screen.DrawImage(g.drawTargets.Ground, nil)
+	//screen.DrawImage(g.drawTargets.Shadow, nil)
+	screen.DrawImage(g.drawTargets.World, nil)
+	screen.DrawImage(g.drawTargets.Sky, nil)
+}
+
+func (g *Game) LocalPlayer() *Player {
+	return g.players[0]
 }

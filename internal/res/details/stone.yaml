@@ -1,0 +1,12 @@
+data:
+  id: ground:stone
+  name: stone
+  description: Stoney.
+visual:
+  image: ground/stone
+  width: 20
+  height: 20
+  low: true
+behavior:
+  blocks: true
+  hurts: true

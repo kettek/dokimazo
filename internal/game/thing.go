@@ -1,7 +1,10 @@
 package game
 
 type Thing interface {
-	Update()
+	Update() []Request
+	HandleRequest(Request, bool)
+	Chunk() *Chunk
+	SetChunk(*Chunk)
 }
 
 type Things []Thing

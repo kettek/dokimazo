@@ -1,0 +1,12 @@
+data:
+  id: ground:dirt
+  name: dirt
+  description: Substrate.
+visual:
+  image: ground/dirt
+  width: 20
+  height: 20
+  low: true
+behavior:
+  blocks: true
+  hurts: true

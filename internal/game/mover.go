@@ -7,21 +7,29 @@ import (
 )
 
 type Mover struct {
+	chunk *Chunk
 	*SpriteStack
 }
 
 func NewMover() *Mover {
 	return &Mover{
-		//Sprite: NewSpriteFromImage(res.MustLoadImage("thing.png")),
-		SpriteStack: NewSpriteStackFromImageSheet(res.NewImageSheet(res.MustLoadImage("humus.png"), 16, 16)),
+		SpriteStack: NewSpriteStackFromSheet(res.MustLoadSheet("koinon.png")),
 	}
+}
+
+func (m *Mover) SetChunk(chunk *Chunk) {
+	m.chunk = chunk
+}
+
+func (m *Mover) Chunk() *Chunk {
+	return m.chunk
 }
 
 func (m *Mover) Draw(drawOpts DrawOpts) {
 	m.SpriteStack.Draw(drawOpts)
 }
 
-func (m *Mover) Update() {
+func (m *Mover) Update() (actions []Request) {
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
 		m.Rotate(-0.05)
 	} else if ebiten.IsKeyPressed(ebiten.KeyD) {
@@ -33,4 +41,5 @@ func (m *Mover) Update() {
 	} else if ebiten.IsKeyPressed(ebiten.KeyS) {
 		m.Sub(m.Forward())
 	}
+	return
 }
