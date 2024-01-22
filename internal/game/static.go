@@ -1,7 +1,7 @@
 package game
 
 import (
-	"rotate-test/internal/res"
+	"github.com/kettek/dokimazo/internal/res"
 )
 
 type Static struct {

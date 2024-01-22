@@ -1,4 +1,4 @@
-module rotate-test
+module github.com/kettek/dokimazo
 
 go 1.21.6
 

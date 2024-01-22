@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"rotate-test/internal/res"
+
+	"github.com/kettek/dokimazo/internal/res"
 
 	"github.com/KEINOS/go-noise"
 )

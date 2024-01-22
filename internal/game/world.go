@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"rotate-test/internal/res"
+
+	"github.com/kettek/dokimazo/internal/res"
 )
 
 // TileState is a bitfield of potential tile states.
