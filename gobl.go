@@ -12,14 +12,14 @@ func main() {
 		exe = ".exe"
 	}
 
-	runArgs := append([]interface{}{}, "./rotate"+exe)
+	runArgs := append([]interface{}{}, "./dokimazo"+exe)
 
 	Task("build").
-		Exec("go", "build", "./cmd/rotate")
+		Exec("go", "build", "./cmd/dokimazo")
 	Task("run").
 		Exec(runArgs...)
 	Task("watch").
-		Watch("cmd/rotate/*", "internal/game/*", "internal/res/*").
+		Watch("cmd/dokimazo/*", "internal/game/*", "internal/res/*").
 		Signaler(SigQuit).
 		Run("build").
 		Run("run")
