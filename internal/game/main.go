@@ -44,6 +44,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.drawTargets.Ground = ebiten.NewImage(outsideWidth, outsideHeight)
 		g.drawTargets.Shadow = ebiten.NewImage(outsideWidth, outsideHeight)
 		g.drawTargets.World = ebiten.NewImage(outsideWidth, outsideHeight)
+		g.drawTargets.Drops = ebiten.NewImage(outsideWidth, outsideHeight)
 		g.drawTargets.Sky = ebiten.NewImage(outsideWidth, outsideHeight)
 		g.camera.Layout(outsideWidth, outsideHeight)
 	}
@@ -63,25 +64,29 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	chunks := g.world.ChunksAround(px, py)
 
 	// Collect visuals to render.
-	var lowVisuals, medVisuals, skyVisuals Visuals
+	var lowVisuals, medVisuals, dropVisuals, skyVisuals Visuals
 	for _, chunk := range chunks {
 		lowVisuals = append(lowVisuals, chunk.lowVisuals...)
 		medVisuals = append(medVisuals, chunk.medVisuals...)
+		dropVisuals = append(dropVisuals, chunk.dropVisuals...)
 		skyVisuals = append(skyVisuals, chunk.highVisuals...)
 	}
 
 	g.drawTargets.Ground.Clear()
 	g.drawTargets.Shadow.Clear()
 	g.drawTargets.World.Clear()
+	g.drawTargets.Drops.Clear()
 	g.drawTargets.Sky.Clear()
 
 	g.camera.Draw(g.drawTargets.Ground, lowVisuals, CameraDrawOptions{})
 	//g.camera.Draw(g.drawTargets.Shadow, medVisuals, CameraDrawOptions{Shadows: true, HideVisuals: true})
 	g.camera.Draw(g.drawTargets.World, medVisuals, CameraDrawOptions{Shadows: true})
+	g.camera.Draw(g.drawTargets.Drops, dropVisuals, CameraDrawOptions{Shadows: true})
 	g.camera.Draw(g.drawTargets.Sky, skyVisuals, CameraDrawOptions{})
 
 	screen.DrawImage(g.drawTargets.Ground, nil)
 	//screen.DrawImage(g.drawTargets.Shadow, nil)
+	screen.DrawImage(g.drawTargets.Drops, nil)
 	screen.DrawImage(g.drawTargets.World, nil)
 	screen.DrawImage(g.drawTargets.Sky, nil)
 }

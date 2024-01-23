@@ -1,0 +1,8 @@
+data:
+  id: edibles:pierogi
+  name: pierogi
+  description: A delicious pierogi.
+visual:
+  image: edibles/pierogi
+  width: 8
+  height: 8

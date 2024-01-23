@@ -22,6 +22,11 @@ type ChunkUpdateThingRequest struct {
 	Requests []Request
 }
 
+type ChunkUpdateDropRequest struct {
+	Drop     *Drop
+	Requests []Request
+}
+
 const ChunkPixelSize = 16.0
 const ChunkTileSize = 16.0
 
@@ -29,6 +34,7 @@ type VisualLayer uint8
 
 const (
 	VisualLayerGround VisualLayer = iota
+	VisualLayerDrops
 	VisualLayerWorld
 	VisualLayerSky
 )
@@ -38,9 +44,11 @@ type Chunk struct {
 	loaded      bool
 	loadChan    chan error
 	X, Y        int
+	Drops       Drops
 	Tiles       Tiles
 	Things      Things
 	lowVisuals  Visuals // Low visuals generally is the ground.
+	dropVisuals Visuals // Drop visuals are dropped items.
 	medVisuals  Visuals // Med visuals are most game objects.
 	highVisuals Visuals // High visuals are a mystery.
 }
@@ -69,6 +77,8 @@ func (c *Chunk) AddThing(thing Thing, v VisualLayer) {
 		switch v {
 		case VisualLayerGround:
 			c.lowVisuals.Add(thing)
+		case VisualLayerDrops:
+			c.dropVisuals.Add(thing)
 		case VisualLayerWorld:
 			c.medVisuals.Add(thing)
 		case VisualLayerSky:
@@ -82,9 +92,22 @@ func (c *Chunk) RemoveThing(thing Thing) {
 	thing.SetChunk(nil)
 	if thing, ok := thing.(Visual); ok {
 		c.lowVisuals.Remove(thing)
+		c.dropVisuals.Remove(thing)
 		c.medVisuals.Remove(thing)
 		c.highVisuals.Remove(thing)
 	}
+}
+
+func (c *Chunk) AddDrop(drop *Drop) {
+	c.Drops.Add(drop)
+	if drop.Visual != nil {
+		c.dropVisuals.Add(drop)
+	}
+}
+
+func (c *Chunk) RemoveDrop(drop *Drop) {
+	c.Drops.Remove(drop)
+	c.dropVisuals.Remove(drop)
 }
 
 // Update updates the chunk, calling Update on all contained things.
@@ -96,6 +119,16 @@ func (c *Chunk) Update(w *World) (requests []ChunkUpdateRequest) {
 			requests = append(requests, ChunkUpdateThingRequest{
 				Thing:    thing,
 				Requests: thingRequests,
+			})
+		}
+	}
+	// Update them drops.
+	for _, drop := range c.Drops {
+		dropRequests := drop.Update()
+		if len(dropRequests) > 0 {
+			requests = append(requests, ChunkUpdateDropRequest{
+				Drop:     drop,
+				Requests: dropRequests,
 			})
 		}
 	}
@@ -117,6 +150,11 @@ func (c *Chunk) Draw(drawTargets DrawTargets, camera *Camera) {
 		XOffset: x,
 		YOffset: y,
 		Shadows: true,
+	})
+	// Draw drops.
+	camera.Draw(drawTargets.Drops, c.dropVisuals, CameraDrawOptions{
+		XOffset: x,
+		YOffset: y,
 	})
 	// Draw shadows.
 	/*camera.Draw(drawTargets.World, c.medVisuals, CameraDrawOptions{
@@ -157,6 +195,16 @@ func (c *Chunk) process() {
 			}
 		}
 	}
+	for _, cd := range c.Drops {
+		cd.drop = res.Drops[cd.RID]
+		sprite := NewSpriteStackFromSheet(cd.drop.Sheet())
+		sprite.Assign(Vec2{cd.x, cd.y})
+		if cd.drop.Visual.LayerDistance != 0 {
+			sprite.LayerDistance = cd.drop.Visual.LayerDistance
+		}
+		cd.Visual = sprite
+		c.dropVisuals.Add(cd)
+	}
 }
 
 // Load either loads the chunk from disk or generates a new chunk. It is intended to be run as a goroutine within World.
@@ -191,6 +239,16 @@ func (c *Chunk) Load(sneed int64) {
 
 						r := sm.Eval64(px/20, py/20, 0)
 
+						// Randomly throw some pierogies in there.
+						if randy.Intn(100) < 5 {
+							d := &Drop{}
+							rid, _ := res.RIDFromString("edibles:pierogi")
+							d.x = px*ChunkPixelSize + ChunkPixelSize/2
+							d.y = py*ChunkPixelSize + ChunkPixelSize/2
+							d.RID = rid
+							c.Drops = append(c.Drops, d)
+						}
+
 						if randy.Intn(100) < 5 {
 							//if i == 0 || j == 0 || i == 15 || j == 15 {
 							rid, _ := res.RIDFromString("wall:palisade")
@@ -199,7 +257,6 @@ func (c *Chunk) Load(sneed int64) {
 							})
 						}
 						var rid res.RID
-						fmt.Println(j, i, r)
 						if r < 0 {
 							rid, _ = res.RIDFromString("ground:sand")
 						} else if r < 0.5 {

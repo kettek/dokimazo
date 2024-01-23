@@ -13,5 +13,6 @@ type DrawTargets struct {
 	Ground *ebiten.Image
 	Shadow *ebiten.Image
 	World  *ebiten.Image
+	Drops  *ebiten.Image
 	Sky    *ebiten.Image
 }

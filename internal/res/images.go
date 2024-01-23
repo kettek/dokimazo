@@ -13,6 +13,7 @@ import (
 //go:embed images/*
 //go:embed all:images
 //go:embed details/*
+//go:embed drops/*
 var fs embed.FS
 
 const SheetCellWidth = 16
