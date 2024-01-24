@@ -6,6 +6,7 @@ var Time float
 var Position vec2
 var Color vec3
 var Wind float
+var WindDirection float
 var Zoom float
 var Rotation float
 var Density float
@@ -40,6 +41,12 @@ func rotate(angle float) mat2 {
   return mat2(c, -s, s, c)
 }
 
+func rotateVec2(angle float, v vec2) vec2 {
+  c := cos(angle)
+  s := sin(angle)
+  return vec2(c*v.x - s*v.y, s*v.x + c*v.y)
+}
+
 func Fragment(dstPos vec4, srcPos vec2, color vec4) vec4 {
   f := 0.0
 
@@ -52,7 +59,9 @@ func Fragment(dstPos vec4, srcPos vec2, color vec4) vec4 {
   uv *= rotate(Rotation)
   uv += size/2
   
-  uv += Time*Wind + Position
+  t := rotateVec2(WindDirection, vec2(Time*Wind))
+  
+  uv += t + Position
   uv /= size
   
   var m mat2
