@@ -100,9 +100,7 @@ func (c *Chunk) RemoveThing(thing Thing) {
 
 func (c *Chunk) AddDrop(drop *Drop) {
 	c.Drops.Add(drop)
-	if drop.Visual != nil {
-		c.dropVisuals.Add(drop)
-	}
+	c.dropVisuals.Add(drop)
 }
 
 func (c *Chunk) RemoveDrop(drop *Drop) {
@@ -202,7 +200,7 @@ func (c *Chunk) process() {
 		if cd.drop.Visual.LayerDistance != 0 {
 			sprite.LayerDistance = cd.drop.Visual.LayerDistance
 		}
-		cd.Visual = sprite
+		cd.SpriteStack = sprite
 		c.dropVisuals.Add(cd)
 	}
 }

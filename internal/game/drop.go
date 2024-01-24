@@ -27,25 +27,23 @@ type Drop struct {
 	State    interface{} // For now...
 	drop     *res.Drop
 	lifetime int
-	Visual
+	*SpriteStack
 }
 
 func (d *Drop) Update() []Request {
 	d.lifetime++
-	d.x = math.Cos(float64(d.lifetime) / 50.0)
-	d.y = math.Sin(float64(d.lifetime) / 80.0)
+	d.x = math.Cos(float64(d.lifetime) / 40.0)
+	d.y = math.Sin(float64(d.lifetime) / 10.0)
 	// nada
 	return nil
 }
 
 func (d *Drop) Draw(drawOpts DrawOpts) {
-	drawOpts.GeoM.Translate(d.x, d.y-8.0)
-	d.Visual.Draw(drawOpts)
+	drawOpts.GeoM.Translate(d.x*drawOpts.Z, (d.y-8.0)*drawOpts.Z)
+	d.SpriteStack.Draw(drawOpts)
 }
 
 func (d *Drop) DrawShadow(drawOpts DrawOpts) {
-	drawOpts.GeoM.Translate(d.x, 0)
-	if v, ok := d.Visual.(VisualShadow); ok {
-		v.DrawShadow(drawOpts)
-	}
+	drawOpts.GeoM.Translate(d.x*drawOpts.Z, 0)
+	d.SpriteStack.DrawShadow(drawOpts)
 }

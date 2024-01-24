@@ -96,6 +96,37 @@ func (w *World) Update() error {
 							chunkUpdate.Chunk.RemoveThing(chunkRequest.Thing)
 							targetChunk.AddThing(chunkRequest.Thing, VisualLayerWorld)
 						}
+
+						// If the thing is a carrier, check for drops in range and have them move towards the thing and/or be picked up.
+						if carrier, ok := chunkRequest.Thing.(Carrier); ok {
+							chunks := w.ChunksInRange(thingRequest.To.X(), thingRequest.To.Y(), 20.0)
+							// Check if any drops are in range.
+							for _, chunk := range chunks {
+								for _, drop := range chunk.Drops {
+									// Gradually move the drop towards the player.
+									dx := thingRequest.To.X() - drop.Position().X()
+									dy := thingRequest.To.Y() - drop.Position().Y()
+									if math.Abs(dx) < 20.0 && math.Abs(dy) < 20.0 {
+										if math.Abs(dx) < 5.0 && math.Abs(dy) < 5.0 {
+											chunk.RemoveDrop(drop)
+											carrier.AddDrop(drop)
+										} else {
+											if dx < 0 {
+												dx = -3
+											} else if dx > 0 {
+												dx = 3
+											}
+											if dy < 0 {
+												dy = -3
+											} else if dy > 0 {
+												dy = 3
+											}
+											drop.Add(Vec2{dx, dy})
+										}
+									}
+								}
+							}
+						}
 					case RequestRotate:
 						chunkRequest.Thing.HandleRequest(thingRequest, true)
 					}
@@ -157,6 +188,45 @@ func (w *World) ChunksAround(x, y int) (chunks []*Chunk) {
 		}
 	}
 	return chunks
+}
+
+func (w *World) ChunksInRange(x, y float64, distance float64) (chunks []*Chunk) {
+	cx := (x / ChunkPixelSize / ChunkTileSize)
+	cy := (y / ChunkPixelSize / ChunkTileSize)
+	//cx := x
+	//cy := y
+	dx := cx - math.Floor(cx)
+	dy := cy - math.Floor(cy)
+	distance = distance / ChunkPixelSize / ChunkTileSize
+
+	chunks = append(chunks, w.LoadChunk(int(math.Floor(cx)), int(math.Floor(cy))))
+
+	if dx-distance < 0 {
+		chunks = append(chunks, w.LoadChunk(int(math.Floor(cx-1)), int(math.Floor(cy))))
+	}
+	if dx+distance > 1 {
+		chunks = append(chunks, w.LoadChunk(int(math.Floor(cx+1)), int(math.Floor(cy))))
+	}
+	if dy-distance < 0 {
+		chunks = append(chunks, w.LoadChunk(int(math.Floor(cx)), int(math.Floor(cy-1))))
+	}
+	if dy+distance > 1 {
+		chunks = append(chunks, w.LoadChunk(int(math.Floor(cx)), int(math.Floor(cy+1))))
+	}
+	if dx-distance < 0 && dy-distance < 0 {
+		chunks = append(chunks, w.LoadChunk(int(math.Floor(cx-1)), int(math.Floor(cy-1))))
+	}
+	if dx+distance > 1 && dy-distance < 0 {
+		chunks = append(chunks, w.LoadChunk(int(math.Floor(cx+1)), int(math.Floor(cy-1))))
+	}
+	if dx-distance < 0 && dy+distance > 1 {
+		chunks = append(chunks, w.LoadChunk(int(math.Floor(cx-1)), int(math.Floor(cy+1))))
+	}
+	if dx+distance > 1 && dy+distance > 1 {
+		chunks = append(chunks, w.LoadChunk(int(math.Floor(cx+1)), int(math.Floor(cy+1))))
+	}
+
+	return
 }
 
 func (w *World) LoadChunk(x, y int) *Chunk {

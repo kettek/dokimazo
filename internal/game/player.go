@@ -8,6 +8,7 @@ import (
 
 type Player struct {
 	*SpriteStack
+	Inventory
 	chunk *Chunk
 }
 
