@@ -6,6 +6,9 @@ var Time float
 var Position vec2
 var Color vec3
 var Wind float
+var Zoom float
+var Rotation float
+var Density float
 
 func hash(p vec2) vec2 {
   p = vec2( dot(p,vec2(127.1,311.7)), dot(p,vec2(269.5,183.3)) )
@@ -31,11 +34,26 @@ func noise(p vec2) float {
   return dot( n, vec3(70.0) )
 }
 
+func rotate(angle float) mat2 {
+  c := cos(angle)
+  s := sin(angle)
+  return mat2(c, -s, s, c)
+}
+
 func Fragment(dstPos vec4, srcPos vec2, color vec4) vec4 {
   f := 0.0
+
+  size := imageSrc0Size()
   
-  uv := dstPos.xy + Time*Wind + Position
-  uv /= 500
+  uv := srcPos.xy
+
+  uv -= size/2
+  uv /= Zoom
+  uv *= rotate(Rotation)
+  uv += size/2
+  
+  uv += Time*Wind + Position
+  uv /= size
   
   var m mat2
   m = mat2(1.6, 1.2, -1.2, 1.6)
@@ -46,9 +64,8 @@ func Fragment(dstPos vec4, srcPos vec2, color vec4) vec4 {
   f += 0.1250*noise(uv)
   uv = m * uv
   f += 0.0625*noise(uv)
-  uv = m * uv
   
-  //f = 0.5 + 0.5*f
+  f += Density
 
   f *= smoothstep(0.0, 0.005, abs(dstPos.x-0.6))
   

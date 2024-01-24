@@ -76,8 +76,11 @@ func (g *Game) Update() error {
 
 	g.cloudOpts.Uniforms["Time"] = float32(g.cloudTicks)
 	g.cloudOpts.Uniforms["Position"] = []float32{float32(g.camera.X()), float32(g.camera.Y())}
+	g.cloudOpts.Uniforms["Zoom"] = float32(g.camera.Z)
+	g.cloudOpts.Uniforms["Rotation"] = float32(g.camera.angle)
 	g.cloudOpts.Uniforms["Color"] = []float32{0.0, 0.0, 0.0}
 	g.cloudOpts.Uniforms["Wind"] = float32(3.0)
+	g.cloudOpts.Uniforms["Density"] = float32(0.3)
 
 	return nil
 }
