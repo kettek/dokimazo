@@ -14,6 +14,7 @@ import (
 //go:embed all:images
 //go:embed details/*
 //go:embed drops/*
+//go:embed shaders/*
 var fs embed.FS
 
 const SheetCellWidth = 16
