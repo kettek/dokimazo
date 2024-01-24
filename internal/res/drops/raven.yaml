@@ -1,0 +1,8 @@
+data:
+  id: animals:raven
+  name: raven
+  description: Quoth the Raven, Nevermore,
+visual:
+  image: animals/raven
+  width: 24
+  height: 24
