@@ -3,6 +3,10 @@ package main
 //kage:unit pixels
 
 var Time float
+var Position vec2
+var Zoom float
+var Rotation float
+var Color vec4
 
 func hash(p vec2) vec2 {
   p = vec2( dot(p,vec2(127.1,311.7)), dot(p,vec2(269.5,183.3)) )
@@ -28,14 +32,31 @@ func noise(p vec2) float {
   return dot( n, vec3(70.0) )
 }
 
+func rotate(angle float) mat2 {
+  c := cos(angle)
+  s := sin(angle)
+  return mat2(c, -s, s, c)
+}
+
 func Fragment(dstPos vec4, srcPos vec2, color vec4) vec4 {
   f := 0.0
+
+  size := imageSrc0Size()
   
-  uv := dstPos.xy + Time
-  uv /= 100
+  uv := srcPos.xy
+
+  uv -= size/2
+  uv /= Zoom
+  uv *= rotate(Rotation)
+  uv += size/2
+  
+  t := Time
+  
+  uv += t + Position
+  uv /= size
   
   var m mat2
-  m = mat2(1.6, 1.2, -1.2, 1.6)
+  m = mat2(2.6, 1.2, -1.2, 2.6)
   f = 0.5000*noise(uv)
   uv = m * uv
   f += 0.2500*noise(uv)
@@ -49,5 +70,5 @@ func Fragment(dstPos vec4, srcPos vec2, color vec4) vec4 {
 
   f *= smoothstep(0.0, 0.005, abs(dstPos.x-0.6))
 
-  return vec4(f, f, f, f)
+  return vec4(f*Color.r*Color.a, f*Color.g*Color.a, f*Color.b*Color.a, f*Color.a)
 }

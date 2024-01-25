@@ -87,8 +87,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.camera.Draw(g.drawTargets.Drops, dropVisuals, CameraDrawOptions{Shadows: true})
 	g.camera.Draw(g.drawTargets.Sky, skyVisuals, CameraDrawOptions{})
 
-	w, h := g.drawTargets.Sky.Bounds().Dx(), g.drawTargets.Sky.Bounds().Dy()
-	g.drawTargets.Sky.DrawRectShader(w, h, g.world.biosphere.cloudShader, &g.world.biosphere.cloudOpts)
+	if g.world.biosphere.fogDensity > 0 {
+		w, h := g.drawTargets.World.Bounds().Dx(), g.drawTargets.World.Bounds().Dy()
+		g.drawTargets.World.DrawRectShader(w, h, g.world.biosphere.fogShader, &g.world.biosphere.fogOpts)
+	}
+
+	if g.world.biosphere.cloudDensity > 0 {
+		w, h := g.drawTargets.Sky.Bounds().Dx(), g.drawTargets.Sky.Bounds().Dy()
+		g.drawTargets.Sky.DrawRectShader(w, h, g.world.biosphere.cloudShader, &g.world.biosphere.cloudOpts)
+	}
 
 	screen.DrawImage(g.drawTargets.Ground, nil)
 	//screen.DrawImage(g.drawTargets.Shadow, nil)

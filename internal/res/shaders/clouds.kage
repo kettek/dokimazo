@@ -74,7 +74,7 @@ func Fragment(dstPos vec4, srcPos vec2, color vec4) vec4 {
   uv = m * uv
   f += 0.0625*noise(uv)
   
-  f += Density
+  f *= Density
 
   f *= smoothstep(0.0, 0.005, abs(dstPos.x-0.6))
   
