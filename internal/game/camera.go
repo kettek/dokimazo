@@ -21,6 +21,12 @@ type Camera struct {
 	sortNext bool
 }
 
+type CameraUpdates struct {
+	Rotated bool
+	Moved   bool
+	Zoomed  bool
+}
+
 func NewCamera() *Camera {
 	c := &Camera{
 		W:        1,
@@ -47,26 +53,31 @@ func (c *Camera) updateImage() {
 	c.image = ebiten.NewImage(int(c.W), int(c.H))
 }
 
-func (c *Camera) Update() error {
+func (c *Camera) Update() (updates CameraUpdates, err error) {
 	if c.Target != nil {
 		p := c.Target.Position()
 		s := c.Target.Size()
 		p.Add(Vec2{s.X() / 2, s.Y() / 2})
 		c.Assign(p)
+		updates.Moved = true
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		c.Rotate(0.02)
 		c.sortNext = true
+		updates.Rotated = true
 	} else if ebiten.IsKeyPressed(ebiten.KeyE) {
 		c.Rotate(-0.02)
 		c.sortNext = true
+		updates.Rotated = true
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyZ) {
 		c.Z -= 0.01
+		updates.Zoomed = true
 	} else if ebiten.IsKeyPressed(ebiten.KeyX) {
 		c.Z += 0.01
+		updates.Zoomed = true
 	}
-	return nil
+	return updates, err
 }
 
 func (c *Camera) Draw(screen *ebiten.Image, visuals Visuals, opts CameraDrawOptions) {
