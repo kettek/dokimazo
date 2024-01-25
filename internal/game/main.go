@@ -48,7 +48,11 @@ func New() *Game {
 		panic(err)
 	}
 	g.cloudOpts = ebiten.DrawRectShaderOptions{
-		Uniforms: make(map[string]any),
+		Uniforms: map[string]any{
+			"Zoom":     g.camera.Z,
+			"Rotation": float32(g.camera.angle),
+			"Position": []float32{float32(g.camera.X()), float32(g.camera.Y())},
+		},
 	}
 
 	return g
