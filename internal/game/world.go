@@ -39,11 +39,13 @@ type World struct {
 	sneed         int64
 	loadingChunks []*Chunk
 	loadedChunks  []*Chunk
+	biosphere     *Biosphere
 }
 
 func NewWorld() *World {
 	return &World{
-		sneed: rand.Int63(),
+		sneed:     rand.Int63(),
+		biosphere: NewBiosphere(),
 	}
 }
 
@@ -177,6 +179,9 @@ func (w *World) Update() error {
 			}
 		}
 	}
+
+	// Update the biosphere.
+	w.biosphere.Update()
 
 	return nil
 }

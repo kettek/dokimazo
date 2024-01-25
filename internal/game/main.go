@@ -2,7 +2,6 @@ package game
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/kettek/dokimazo/internal/res"
 )
 
 type Game struct {
@@ -14,12 +13,6 @@ type Game struct {
 
 	//
 	drawTargets DrawTargets
-
-	//
-	cloudShader *ebiten.Shader
-	cloudOpts   ebiten.DrawRectShaderOptions
-	cloudTicks  float64
-
 	//
 	lastWidth, lastHeight int
 }
@@ -42,18 +35,7 @@ func New() *Game {
 
 	g.camera.Target = p
 
-	var err error
-	g.cloudShader, err = res.LoadShader("clouds.kage")
-	if err != nil {
-		panic(err)
-	}
-	g.cloudOpts = ebiten.DrawRectShaderOptions{
-		Uniforms: map[string]any{
-			"Zoom":     g.camera.Z,
-			"Rotation": float32(g.camera.angle),
-			"Position": []float32{float32(g.camera.X()), float32(g.camera.Y())},
-		},
-	}
+	g.world.biosphere.camera = &g.camera
 
 	return g
 }
@@ -75,25 +57,7 @@ func (g *Game) Update() error {
 	if err := g.world.Update(); err != nil {
 		return err
 	}
-	updates, _ := g.camera.Update()
-	g.cloudTicks += 0.1
-
-	// Is it more efficient to have these if checks, or would it be better just to set them all?
-	if updates.Rotated {
-		g.cloudOpts.Uniforms["Rotation"] = float32(g.camera.angle)
-	}
-	if updates.Zoomed {
-		g.cloudOpts.Uniforms["Zoom"] = float32(g.camera.Z)
-	}
-	if updates.Moved {
-		g.cloudOpts.Uniforms["Position"] = []float32{float32(g.camera.X()), float32(g.camera.Y())}
-	}
-
-	g.cloudOpts.Uniforms["Time"] = float32(g.cloudTicks)
-	g.cloudOpts.Uniforms["Color"] = []float32{0.0, 0.0, 0.0}
-	g.cloudOpts.Uniforms["Wind"] = float32(3.0)
-	g.cloudOpts.Uniforms["WindDirection"] = float32(3.0)
-	g.cloudOpts.Uniforms["Density"] = float32(0.3)
+	g.camera.Update()
 
 	return nil
 }
@@ -124,7 +88,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.camera.Draw(g.drawTargets.Sky, skyVisuals, CameraDrawOptions{})
 
 	w, h := g.drawTargets.Sky.Bounds().Dx(), g.drawTargets.Sky.Bounds().Dy()
-	g.drawTargets.Sky.DrawRectShader(w, h, g.cloudShader, &g.cloudOpts)
+	g.drawTargets.Sky.DrawRectShader(w, h, g.world.biosphere.cloudShader, &g.world.biosphere.cloudOpts)
 
 	screen.DrawImage(g.drawTargets.Ground, nil)
 	//screen.DrawImage(g.drawTargets.Shadow, nil)
