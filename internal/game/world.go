@@ -43,9 +43,10 @@ type World struct {
 }
 
 func NewWorld() *World {
+	sneed := rand.Int63()
 	return &World{
-		sneed:     rand.Int63(),
-		biosphere: NewBiosphere(),
+		sneed:     sneed,
+		biosphere: NewBiosphere(sneed),
 	}
 }
 

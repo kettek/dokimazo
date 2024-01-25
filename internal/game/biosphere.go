@@ -6,7 +6,11 @@ import (
 )
 
 type Biosphere struct {
-	time               float64
+	sneed int64
+
+	time     uint64
+	timeSeed uint64
+
 	cloudShader        *ebiten.Shader
 	cloudOpts          ebiten.DrawRectShaderOptions
 	cloudColor         [3]float32
@@ -19,9 +23,10 @@ type Biosphere struct {
 	camera    *Camera
 }
 
-func NewBiosphere() *Biosphere {
+func NewBiosphere(sneed int64) *Biosphere {
 	var err error
 	b := &Biosphere{
+		sneed:              sneed,
 		cloudColor:         [3]float32{0.0, 0.0, 0.03},
 		cloudWindSpeed:     3.0,
 		cloudWindDirection: 3.0,
@@ -46,9 +51,16 @@ func NewBiosphere() *Biosphere {
 	return b
 }
 
+// RefreshSeed refreshes the current time-based seed.
+func (b *Biosphere) RefreshSeed() {
+	b.timeSeed = b.time ^ uint64(b.sneed)
+}
+
+// Update updates cloud positions, etc.
 func (b *Biosphere) Update() {
-	b.time += 0.1
-	b.cloudOpts.Uniforms["Time"] = float32(b.time)
+	b.time++
+
+	b.cloudOpts.Uniforms["Time"] = float32(b.time) / 10.0
 	b.cloudOpts.Uniforms["Rotation"] = float32(b.camera.angle)
 	b.cloudOpts.Uniforms["Zoom"] = b.camera.Z
 	b.cloudOpts.Uniforms["Position"] = []float32{float32(b.camera.X()), float32(b.camera.Y())}
