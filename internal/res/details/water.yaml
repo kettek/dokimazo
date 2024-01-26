@@ -1,0 +1,12 @@
+data:
+  id: liquid:water
+  name: water
+  description: Watery.
+visual:
+  image: liquid/water
+  width: 20
+  height: 20
+  low: true
+behavior:
+  blocks: false
+  liquid: true
