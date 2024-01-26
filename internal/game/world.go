@@ -250,6 +250,6 @@ func (w *World) LoadChunk(x, y int) *Chunk {
 	chunk.X = x
 	chunk.Y = y
 	w.loadingChunks = append(w.loadingChunks, chunk)
-	go chunk.Load(w.sneed)
+	go chunk.Load(w.biosphere)
 	return chunk
 }

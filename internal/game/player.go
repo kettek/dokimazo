@@ -44,11 +44,11 @@ func (p *Player) Update() (requests []Request) {
 	dir := Vec2{}
 	if ebiten.IsKeyPressed(ebiten.KeyW) {
 		dir = p.Forward()
-		dir.Mul(Vec2{2, 2})
+		dir.Mul(Vec2{8, 8})
 	} else if ebiten.IsKeyPressed(ebiten.KeyS) {
 		dir = p.Forward()
 		dir.Mul(Vec2{-1, -1})
-		dir.Mul(Vec2{2, 2})
+		dir.Mul(Vec2{8, 8})
 	}
 	if dir.X() != 0.0 || dir.Y() != 0.0 {
 		requests = append(requests, RequestMove{From: p.Vec2, To: *dir.Add(p.Vec2)})

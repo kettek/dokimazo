@@ -147,6 +147,21 @@ func (b *Biosphere) SeasonString() string {
 	}
 }
 
+// ElevationAt returns the elevation in chunk tiles of the given point in pixel coordinates.
+func (b *Biosphere) ElevationAt(p Vec2) float64 {
+	x := float64(p.X() / ChunkPixelSize)
+	y := float64(p.Y() / ChunkPixelSize)
+	e := (0.4 + b.noiseGenerator.Eval64(x/10000, y/10000))
+	return e
+}
+
+func (b *Biosphere) AridityAt(p Vec2) float64 {
+	x := float64(p.X())
+	y := float64(p.Y())
+	a := (0.5 + b.noiseGenerator.Eval64(x/100000, y/100000))
+	return a
+}
+
 // Update updates cloud positions, etc.
 func (b *Biosphere) Update() {
 	b.UpdateTime()

@@ -6,8 +6,6 @@ import (
 	"os"
 
 	"github.com/kettek/dokimazo/internal/res"
-
-	"github.com/KEINOS/go-noise"
 )
 
 type ChunkUpdateRequests struct {
@@ -206,18 +204,12 @@ func (c *Chunk) process() {
 }
 
 // Load either loads the chunk from disk or generates a new chunk. It is intended to be run as a goroutine within World.
-func (c *Chunk) Load(sneed int64) {
+func (c *Chunk) Load(b *Biosphere) {
 	var chunkHash uint64
 	chunkHash = uint64(c.X)
 	chunkHash ^= uint64(c.Y) << 32
 	chunkHash ^= uint64(c.Y) >> 32
-	chunkSeed := chunkHash ^ uint64(sneed)
-
-	// FIXME: Move this and sneed to a GenOptions struct that gets passed in.
-	sm, err := noise.New(noise.OpenSimplex, sneed)
-	if err != nil {
-		panic(err)
-	}
+	chunkSeed := chunkHash ^ uint64(b.sneed)
 
 	randy := rand.New(rand.NewSource(int64(chunkSeed)))
 	for done := false; !done; {
@@ -235,7 +227,9 @@ func (c *Chunk) Load(sneed int64) {
 						px := (float64(c.X*ChunkTileSize) + float64(i))
 						py := (float64(c.Y*ChunkTileSize) + float64(j))
 
-						r := sm.Eval64(px/20, py/20, 0)
+						r := b.noiseGenerator.Eval64(px/20, py/20, 0)
+						e := b.ElevationAt(Vec2{px * ChunkPixelSize, py * ChunkPixelSize})
+						a := b.AridityAt(Vec2{px * ChunkPixelSize, py * ChunkPixelSize})
 
 						// Randomly throw some pierogies in there.
 						if randy.Intn(100) < 5 {
@@ -255,12 +249,19 @@ func (c *Chunk) Load(sneed int64) {
 							})
 						}
 						var rid res.RID
-						if r < 0 {
-							rid, _ = res.RIDFromString("ground:sand")
-						} else if r < 0.5 {
-							rid, _ = res.RIDFromString("ground:dirt")
+						r += e
+						fmt.Println(r, e, a)
+						if (r < -0.2 || e < -0.01) && a < 0.3 {
+							rid, _ = res.RIDFromString("liquid:water")
 						} else {
-							rid, _ = res.RIDFromString("ground:stone")
+							r -= a
+							if r < -0.1 {
+								rid, _ = res.RIDFromString("ground:sand")
+							} else if r < 0.5 {
+								rid, _ = res.RIDFromString("ground:dirt")
+							} else {
+								rid, _ = res.RIDFromString("ground:stone")
+							}
 						}
 						t.Details = append(t.Details, TileDetail{
 							RID: rid,

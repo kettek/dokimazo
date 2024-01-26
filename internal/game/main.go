@@ -110,7 +110,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	h, m := math.Modf(g.world.biosphere.clock)
 	m *= 100
 	k, c, f := g.world.biosphere.Temperatures()
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("day %d, %02.0f:%02.0f\nseason %.2f (%s)\ntemp %.2fK | %.2fC | %.2fF", g.world.biosphere.day, h, m, g.world.biosphere.season, g.world.biosphere.SeasonString(), k, c, f))
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("day %d, %02.0f:%02.0f\nseason %.2f (%s)\ntemp %.2fK | %.2fC | %.2fF\n%.2fm elevation\n%.2f aridity", g.world.biosphere.day, h, m, g.world.biosphere.season, g.world.biosphere.SeasonString(), k, c, f, g.world.biosphere.ElevationAt(g.LocalPlayer().Position())*5000, g.world.biosphere.AridityAt(g.LocalPlayer().Position())))
 }
 
 func (g *Game) LocalPlayer() *Player {
