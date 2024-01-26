@@ -179,7 +179,7 @@ func (c *Chunk) process() {
 				td := &tile.Details[k]
 				td.detail = res.Details[td.RID]
 				sprite := NewSpriteStackFromSheet(td.detail.Sheet())
-				sprite.Assign(Vec2{x + float64(i*ChunkPixelSize+ChunkPixelSize/2), y + float64(j*ChunkPixelSize+ChunkPixelSize/2)})
+				sprite.Assign(Vec2{x + float64(i*ChunkPixelSize), y + float64(j*ChunkPixelSize)})
 				if td.detail.Visual.LayerDistance != 0 {
 					sprite.LayerDistance = td.detail.Visual.LayerDistance
 				}
@@ -191,6 +191,9 @@ func (c *Chunk) process() {
 					c.lowVisuals.Add(td.visual)
 				} else {
 					c.medVisuals.Add(td.visual)
+				}
+				if td.detail.Behavior.Blocks {
+					tile.State |= TileStateSolid
 				}
 			}
 		}

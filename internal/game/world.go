@@ -28,6 +28,13 @@ type Tile struct {
 
 type Tiles [][]Tile
 
+func (t Tiles) At(x, y int) *Tile {
+	if x < 0 || y < 0 || x >= len(t) || y >= len((t)[x]) {
+		return nil
+	}
+	return &(t)[x][y]
+}
+
 type TileDetail struct {
 	RID    res.RID
 	State  interface{} // I guess for now
@@ -92,13 +99,36 @@ func (w *World) Update() error {
 				for _, thingRequest := range chunkRequest.Requests {
 					switch thingRequest := thingRequest.(type) {
 					case RequestMove:
-						chunkRequest.Thing.HandleRequest(thingRequest, true)
+						targetChunk := chunkUpdate.Chunk
 						cx, cy := int(math.Floor(thingRequest.To.X()/ChunkPixelSize/ChunkTileSize)), int(math.Floor(thingRequest.To.Y()/ChunkPixelSize/ChunkTileSize))
 						if cx != chunkRequest.Thing.Chunk().X || cy != chunkRequest.Thing.Chunk().Y {
-							targetChunk := w.LoadChunk(cx, cy)
-							chunkUpdate.Chunk.RemoveThing(chunkRequest.Thing)
-							targetChunk.AddThing(chunkRequest.Thing, VisualLayerWorld)
+							targetChunk = w.LoadChunk(cx, cy)
 						}
+						// Check the tile the thing wants to move to.
+						// Get the tile x,y from the request position.
+						tx, ty := int(math.Floor(thingRequest.To.X()/ChunkPixelSize))-cx*ChunkPixelSize, int(math.Floor(thingRequest.To.Y()/ChunkPixelSize))-cy*ChunkPixelSize
+						if tile := targetChunk.Tiles.At(tx, ty); tile != nil {
+							if tile.State&TileStateSolid == 0 {
+								if targetChunk != chunkUpdate.Chunk {
+									chunkUpdate.Chunk.RemoveThing(chunkRequest.Thing)
+									targetChunk.AddThing(chunkRequest.Thing, VisualLayerWorld)
+								}
+							} else {
+								tileX, tileY := float64(tx+cx*ChunkPixelSize)*ChunkPixelSize, float64(ty+cy*ChunkPixelSize)*ChunkPixelSize
+								// Get the distance from the tile to the thing.
+								dx, dy := tileX-thingRequest.From.X(), tileY-thingRequest.From.Y()
+								// Get the distance to move to the tile.
+								var moveX, moveY float64
+								if math.Abs(dx) > math.Abs(dy) {
+									moveX = dx / math.Abs(dx)
+								} else {
+									moveY = dy / math.Abs(dy)
+								}
+								// Set the new position.
+								thingRequest.To.Assign(Vec2{thingRequest.From.X() + moveX, thingRequest.From.Y() + moveY})
+							}
+						}
+						chunkRequest.Thing.HandleRequest(thingRequest, true)
 
 						// If the thing is a carrier, check for drops in range and have them move towards the thing and/or be picked up.
 						if carrier, ok := chunkRequest.Thing.(Carrier); ok {
