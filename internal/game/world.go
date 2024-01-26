@@ -59,7 +59,7 @@ func (w *World) Update() error {
 			if err != nil {
 				panic(fmt.Errorf("failed to load chunk: %w", err))
 			}
-			fmt.Println("loaded chunk", chunk.X, chunk.Y)
+			//fmt.Println("loaded chunk", chunk.X, chunk.Y)
 			chunk.loaded = true
 		default:
 		}
@@ -187,9 +187,9 @@ func (w *World) Update() error {
 	return nil
 }
 
-func (w *World) ChunksAround(x, y int) (chunks []*Chunk) {
-	for x1 := x - 1; x1 <= x+1; x1++ {
-		for y1 := y - 1; y1 <= y+1; y1++ {
+func (w *World) ChunksAround(x, y, dx, dy int) (chunks []*Chunk) {
+	for x1 := x - dx; x1 <= x+dx; x1++ {
+		for y1 := y - dy; y1 <= y+dy; y1++ {
 			chunks = append(chunks, w.LoadChunk(x1, y1))
 		}
 	}

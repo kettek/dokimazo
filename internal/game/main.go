@@ -68,7 +68,9 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	px, py := g.LocalPlayer().Chunk().X, g.LocalPlayer().Chunk().Y
-	chunks := g.world.ChunksAround(px, py)
+	distanceX := math.Max(1, float64(screen.Bounds().Dx()/ChunkPixelSize/ChunkTileSize)/g.camera.Z)
+	distanceY := math.Max(1, float64(screen.Bounds().Dy()/ChunkPixelSize/ChunkTileSize)/g.camera.Z)
+	chunks := g.world.ChunksAround(px, py, int(distanceX), int(distanceY))
 
 	// Collect visuals to render.
 	var lowVisuals, medVisuals, dropVisuals, skyVisuals Visuals
