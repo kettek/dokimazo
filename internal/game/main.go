@@ -1,7 +1,11 @@
 package game
 
 import (
+	"fmt"
+	"math"
+
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type Game struct {
@@ -102,6 +106,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(g.drawTargets.Drops, nil)
 	screen.DrawImage(g.drawTargets.World, nil)
 	screen.DrawImage(g.drawTargets.Sky, nil)
+
+	h, m := math.Modf(g.world.biosphere.clock)
+	m *= 100
+	k, c, f := g.world.biosphere.Temperatures()
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("day %d, %02.0f:%02.0f\nseason %.2f (%s)\ntemp %.2fK | %.2fC | %.2fF", g.world.biosphere.day, h, m, g.world.biosphere.season, g.world.biosphere.SeasonString(), k, c, f))
 }
 
 func (g *Game) LocalPlayer() *Player {
