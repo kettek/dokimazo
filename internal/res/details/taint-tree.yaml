@@ -1,0 +1,13 @@
+data:
+  id: tree:taint
+  name: tain tree
+  description: A tree tainted by suffering.
+visual:
+  image: tree/taint-large
+  layer_distance: 2
+  width: 32
+  height: 32
+  random_rotation: true
+behavior:
+  blocks: true
+  hurts: true
