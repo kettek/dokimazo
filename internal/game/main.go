@@ -87,11 +87,18 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.drawTargets.Drops.Clear()
 	g.drawTargets.Sky.Clear()
 
-	g.camera.Draw(g.drawTargets.Ground, lowVisuals, CameraDrawOptions{})
+	drawOpts := CameraDrawOptions{
+		ShadowAngle: g.world.biosphere.daynight * math.Pi * 2,
+		// TODO: ShadowAngle... need just a simple daytime float, or extend daynight to be -1 to 1.
+	}
+
+	g.camera.Draw(g.drawTargets.Ground, lowVisuals, drawOpts)
 	//g.camera.Draw(g.drawTargets.Shadow, medVisuals, CameraDrawOptions{Shadows: true, HideVisuals: true})
-	g.camera.Draw(g.drawTargets.World, medVisuals, CameraDrawOptions{Shadows: true})
-	g.camera.Draw(g.drawTargets.Drops, dropVisuals, CameraDrawOptions{Shadows: true})
-	g.camera.Draw(g.drawTargets.Sky, skyVisuals, CameraDrawOptions{})
+	drawOpts.Shadows = true
+	g.camera.Draw(g.drawTargets.World, medVisuals, drawOpts)
+	g.camera.Draw(g.drawTargets.Drops, dropVisuals, drawOpts)
+	drawOpts.Shadows = false
+	g.camera.Draw(g.drawTargets.Sky, skyVisuals, drawOpts)
 
 	if g.world.biosphere.fogDensity > 0 {
 		w, h := g.drawTargets.World.Bounds().Dx(), g.drawTargets.World.Bounds().Dy()

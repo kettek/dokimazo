@@ -20,10 +20,11 @@ type Biosphere struct {
 	//
 	noiseGenerator noise.Generator
 
-	daytime uint64  // 0-DayLength, representing a day/night cycle in ticks.
-	day     uint64  // represents the current day, as a result of time / DayLength.
-	clock   float64 // 0-24.00, representing the current time of day.
-	season  float64 // 0-1.0, representing the current season.
+	daynight float64 // 0-1.0, representing the current day/night cycle.
+	daytime  uint64  // 0-DayLength, representing a day/night cycle in ticks.
+	day      uint64  // represents the current day, as a result of time / DayLength.
+	clock    float64 // 0-24.00, representing the current time of day.
+	season   float64 // 0-1.0, representing the current season.
 
 	temperature float64 // 0-1.0, representing the current temperature.
 
@@ -94,10 +95,10 @@ func (b *Biosphere) UpdateTime() {
 	// Convert b.time into day/night cycle, divided by
 	b.daytime = b.time % DayLength
 	b.day = b.time / DayLength
-	daynight := float64(b.daytime) / float64(DayLength)
+	b.daynight = float64(b.daytime) / float64(DayLength)
 
 	// Convert daynight to 24-hour clock time.
-	h, m := math.Modf(daynight * 24.0)
+	h, m := math.Modf(b.daynight * 24.0)
 	b.clock = h + m*0.59
 
 	// Refresh temp/season every 10 seconds.

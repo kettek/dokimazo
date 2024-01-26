@@ -23,12 +23,13 @@ type DetailData struct {
 }
 
 type DetailVisual struct {
-	Image         string
-	Width         int
-	Height        int
-	Low           bool
-	LayerDistance float64 `yaml:"layer_distance"`
-	sheet         *Sheet
+	Image          string
+	Width          int
+	Height         int
+	Low            bool
+	LayerDistance  float64 `yaml:"layer_distance"`
+	RandomRotation bool    `yaml:"random_rotation"`
+	sheet          *Sheet
 }
 
 type DetailBehavior struct {

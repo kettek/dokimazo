@@ -84,8 +84,8 @@ func (s *SpriteStack) DrawShadow(drawOpts DrawOpts) {
 		op.ColorScale.ScaleWithColor(color.NRGBA{0, 0, 0, c})
 		drawOpts.Image.DrawImage(s.Sheet.At(col, 0), op)
 		// NOTE: Instead of passing in R and Z as drawOpts, we could just decompose the matrix into its components and use those. The math is a bit over my head, but should be possible.
-		x := math.Cos(-drawOpts.Angle+0.5) * drawOpts.Z * s.LayerDistance
-		y := math.Sin(-drawOpts.Angle+0.5) * drawOpts.Z * s.LayerDistance
+		x := math.Cos(-drawOpts.Angle+drawOpts.ExtraAngle) * drawOpts.Z * s.LayerDistance
+		y := math.Sin(-drawOpts.Angle+drawOpts.ExtraAngle) * drawOpts.Z * s.LayerDistance
 		op.GeoM.Translate(x, y)
 	}
 }

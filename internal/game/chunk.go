@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"os"
 
@@ -182,6 +183,9 @@ func (c *Chunk) process() {
 				if td.detail.Visual.LayerDistance != 0 {
 					sprite.LayerDistance = td.detail.Visual.LayerDistance
 				}
+				if td.detail.Visual.RandomRotation {
+					sprite.angle = rand.Float64() * math.Pi * 2
+				}
 				td.visual = sprite
 				if td.detail.Visual.Low {
 					c.lowVisuals.Add(td.visual)
@@ -243,7 +247,7 @@ func (c *Chunk) Load(b *Biosphere) {
 
 						if randy.Intn(100) < 5 {
 							//if i == 0 || j == 0 || i == 15 || j == 15 {
-							rid, _ := res.RIDFromString("wall:palisade")
+							rid, _ := res.RIDFromString("tree:taint")
 							t.Details = append(t.Details, TileDetail{
 								RID: rid,
 							})
