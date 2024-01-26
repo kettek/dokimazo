@@ -1,0 +1,11 @@
+data:
+  id: ground:taintground
+  name: tainted ground
+  description: Nasty.
+visual:
+  image: ground/taintground
+  width: 20
+  height: 20
+  low: true
+behavior:
+  hurts: true

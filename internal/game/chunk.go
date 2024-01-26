@@ -260,15 +260,15 @@ func (c *Chunk) Load(b *Biosphere) {
 						} else {
 							//r -= a
 							if r < -0.1 && a > 0.5 {
-								rid, _ = res.RIDFromString("ground:sand")
+								rid, _ = res.RIDFromString("ground:taintsand")
 							} else if r < 0.2 {
-								rid, _ = res.RIDFromString("ground:dirt")
+								rid, _ = res.RIDFromString("ground:taintsand")
 							} else if r < 0.8 {
-								rid, _ = res.RIDFromString("ground:grass")
+								rid, _ = res.RIDFromString("ground:taintground")
 							} else if e > 0.5 {
-								rid, _ = res.RIDFromString("ground:stone")
+								rid, _ = res.RIDFromString("ground:taintsand")
 							} else {
-								rid, _ = res.RIDFromString("ground:dirt")
+								rid, _ = res.RIDFromString("ground:taintground")
 							}
 						}
 						t.Details = append(t.Details, TileDetail{

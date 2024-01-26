@@ -1,0 +1,11 @@
+data:
+  id: ground:taintsand
+  name: tainted sand
+  description: Nasty sandy.
+visual:
+  image: ground/taintsand
+  width: 20
+  height: 20
+  low: true
+behavior:
+  hurts: true
