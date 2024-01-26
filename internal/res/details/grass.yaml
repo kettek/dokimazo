@@ -1,0 +1,11 @@
+data:
+  id: ground:grass
+  name: grass
+  description: Grassy.
+visual:
+  image: ground/grass
+  width: 20
+  height: 20
+  low: true
+behavior:
+  blocks: false
