@@ -158,7 +158,7 @@ func (b *Biosphere) ElevationAt(p Vec2) float64 {
 func (b *Biosphere) AridityAt(p Vec2) float64 {
 	x := float64(p.X())
 	y := float64(p.Y())
-	a := (0.5 + b.noiseGenerator.Eval64(x/100000, y/100000))
+	a := 1.0 - (0.8 + b.noiseGenerator.Eval64(x/100000, y/100000))
 	return a
 }
 

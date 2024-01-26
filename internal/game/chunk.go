@@ -227,7 +227,7 @@ func (c *Chunk) Load(b *Biosphere) {
 						px := (float64(c.X*ChunkTileSize) + float64(i))
 						py := (float64(c.Y*ChunkTileSize) + float64(j))
 
-						r := b.noiseGenerator.Eval64(px/20, py/20, 0)
+						r := b.noiseGenerator.Eval64(px/60, py/60, 0)
 						e := b.ElevationAt(Vec2{px * ChunkPixelSize, py * ChunkPixelSize})
 						a := b.AridityAt(Vec2{px * ChunkPixelSize, py * ChunkPixelSize})
 
@@ -250,17 +250,21 @@ func (c *Chunk) Load(b *Biosphere) {
 						}
 						var rid res.RID
 						r += e
-						fmt.Println(r, e, a)
+						//fmt.Println(r, e, a)
 						if (r < -0.2 || e < -0.01) && a < 0.3 {
 							rid, _ = res.RIDFromString("liquid:water")
 						} else {
-							r -= a
-							if r < -0.1 {
+							//r -= a
+							if r < -0.1 && a > 0.5 {
 								rid, _ = res.RIDFromString("ground:sand")
-							} else if r < 0.5 {
+							} else if r < 0.2 {
 								rid, _ = res.RIDFromString("ground:dirt")
-							} else {
+							} else if r < 0.8 {
+								rid, _ = res.RIDFromString("ground:grass")
+							} else if e > 0.5 {
 								rid, _ = res.RIDFromString("ground:stone")
+							} else {
+								rid, _ = res.RIDFromString("ground:dirt")
 							}
 						}
 						t.Details = append(t.Details, TileDetail{
