@@ -114,18 +114,22 @@ func (w *World) Update() error {
 									targetChunk.AddThing(chunkRequest.Thing, VisualLayerWorld)
 								}
 							} else {
-								tileX, tileY := float64(tx+cx*ChunkPixelSize)*ChunkPixelSize, float64(ty+cy*ChunkPixelSize)*ChunkPixelSize
+								tvec := Vec2{
+									float64(tx+cx*ChunkPixelSize) * ChunkPixelSize,
+									float64(ty+cy*ChunkPixelSize) * ChunkPixelSize,
+								}
+								dvec := tvec.Clone()
 								// Get the distance from the tile to the thing.
-								dx, dy := tileX-thingRequest.From.X(), tileY-thingRequest.From.Y()
+								dvec.Sub(thingRequest.To)
 								// Get the distance to move to the tile.
 								var moveX, moveY float64
-								if math.Abs(dx) > math.Abs(dy) {
-									moveX = dx / math.Abs(dx)
+								if math.Abs(dvec.X()) > math.Abs(dvec.Y()) {
+									moveX = dvec.X() / math.Abs(dvec.X())
 								} else {
-									moveY = dy / math.Abs(dy)
+									moveY = dvec.Y() / math.Abs(dvec.Y())
 								}
 								// Set the new position.
-								thingRequest.To.Assign(Vec2{thingRequest.From.X() + moveX, thingRequest.From.Y() + moveY})
+								thingRequest.To.Assign(Vec2{thingRequest.To.X() + moveX, thingRequest.To.Y() + moveY})
 							}
 						}
 						chunkRequest.Thing.HandleRequest(thingRequest, true)
