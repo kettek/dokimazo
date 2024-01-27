@@ -8,6 +8,7 @@ import (
 
 type Player struct {
 	*SpriteStack
+	Velocity Vec2
 	Inventory
 	chunk *Chunk
 }
@@ -44,14 +45,23 @@ func (p *Player) Update() (requests []Request) {
 	dir := Vec2{}
 	if ebiten.IsKeyPressed(ebiten.KeyW) {
 		dir = p.Forward()
-		dir.Mul(Vec2{8, 8})
+		p.Velocity.Add(dir)
 	} else if ebiten.IsKeyPressed(ebiten.KeyS) {
 		dir = p.Forward()
 		dir.Mul(Vec2{-1, -1})
-		dir.Mul(Vec2{8, 8})
+		p.Velocity.Add(dir)
 	}
-	if dir.X() != 0.0 || dir.Y() != 0.0 {
-		requests = append(requests, RequestMove{From: p.Vec2, To: *dir.Add(p.Vec2)})
+	if p.Velocity.X() != 0.0 || p.Velocity.Y() != 0.0 {
+		v := p.Vec2.Clone()
+		v.Add(p.Velocity)
+		requests = append(requests, RequestMove{From: p.Vec2, To: v})
+	}
+	p.Velocity.Mul(Vec2{0.5, 0.5})
+	if p.Velocity.X() < 0.01 && p.Velocity.X() > -0.01 {
+		p.Velocity.Assign(Vec2{0, p.Velocity.Y()})
+	}
+	if p.Velocity.Y() < 0.01 && p.Velocity.Y() > -0.01 {
+		p.Velocity.Assign(Vec2{p.Velocity.X(), 0})
 	}
 
 	return
