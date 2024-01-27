@@ -57,6 +57,10 @@ func (v *Vec2) AngleTo(v2 Vec2) float64 {
 	return math.Atan2(v2[1]-v[1], v2[0]-v[0])
 }
 
+func (v Vec2) Clone() Vec2 {
+	return Vec2{v[0], v[1]}
+}
+
 type RVec2 struct {
 	Vec2
 	angle float64
