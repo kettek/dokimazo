@@ -21,3 +21,11 @@ func (i *Inventory) AddDrop(drop *Drop) {
 func (i *Inventory) RemoveDrop(drop *Drop) {
 	i.drops.Remove(drop)
 }
+
+func (i *Inventory) CloneInventory() Inventory {
+	clone := Inventory{}
+	for _, drop := range i.drops {
+		clone.drops.Add(drop)
+	}
+	return clone
+}
