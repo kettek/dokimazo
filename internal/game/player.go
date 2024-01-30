@@ -2,11 +2,11 @@ package game
 
 import (
 	"github.com/kettek/dokimazo/internal/res"
-
-	"github.com/hajimehoshi/ebiten/v2"
+	input "github.com/quasilyte/ebitengine-input"
 )
 
 type Player struct {
+	input *input.Handler
 	*SpriteStack
 	Velocity Vec2
 	Inventory
@@ -33,9 +33,9 @@ func (p *Player) Draw(drawOpts DrawOpts) {
 
 func (p *Player) Update() (requests []Request) {
 	r := 0.0
-	if ebiten.IsKeyPressed(ebiten.KeyA) {
+	if p.input.ActionIsPressed(InputTurnLeft) {
 		r -= 0.05
-	} else if ebiten.IsKeyPressed(ebiten.KeyD) {
+	} else if p.input.ActionIsPressed(InputTurnRight) {
 		r += 0.05
 	}
 	if r != 0.0 {
@@ -43,10 +43,10 @@ func (p *Player) Update() (requests []Request) {
 	}
 
 	dir := Vec2{}
-	if ebiten.IsKeyPressed(ebiten.KeyW) {
+	if p.input.ActionIsPressed(InputMoveForward) {
 		dir = p.Forward()
 		p.Velocity.Add(dir)
-	} else if ebiten.IsKeyPressed(ebiten.KeyS) {
+	} else if p.input.ActionIsPressed(InputMoveBackward) {
 		dir = p.Forward()
 		dir.Mul(Vec2{-1, -1})
 		p.Velocity.Add(dir)

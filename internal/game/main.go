@@ -6,6 +6,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	input "github.com/quasilyte/ebitengine-input"
 )
 
 type Game struct {
@@ -15,11 +16,26 @@ type Game struct {
 
 	players []*Player
 
+	input input.System
+
 	//
 	drawTargets DrawTargets
 	//
 	lastWidth, lastHeight int
 }
+
+const (
+	InputTurnLeft input.Action = iota
+	InputTurnRight
+	InputMoveForward
+	InputMoveBackward
+	InputInteract
+	//
+	InputRotateCameraLeft
+	InputRotateCameraRight
+	InputZoomCameraIn
+	InputZoomCameraOut
+)
 
 func New() *Game {
 	g := &Game{
@@ -40,6 +56,24 @@ func New() *Game {
 	g.camera.Target = p
 
 	g.world.biosphere.camera = &g.camera
+
+	g.input.Init(input.SystemConfig{
+		DevicesEnabled: input.MouseDevice | input.KeyboardDevice | input.GamepadDevice,
+	})
+	keymap := input.Keymap{
+		InputTurnLeft:     {input.KeyA, input.KeyGamepadLeft},
+		InputTurnRight:    {input.KeyD, input.KeyGamepadRight},
+		InputMoveForward:  {input.KeyW, input.KeyGamepadUp},
+		InputMoveBackward: {input.KeyS, input.KeyGamepadDown},
+		InputInteract:     {input.KeyF, input.KeyMouseLeft, input.KeyGamepadA},
+	}
+	p.input = g.input.NewHandler(0, keymap)
+	g.camera.input = g.input.NewHandler(0, input.Keymap{
+		InputRotateCameraLeft:  {input.KeyQ, input.KeyGamepadL1},
+		InputRotateCameraRight: {input.KeyE, input.KeyGamepadR1},
+		InputZoomCameraIn:      {input.KeyZ, input.KeyGamepadL2},
+		InputZoomCameraOut:     {input.KeyX, input.KeyGamepadR2},
+	})
 
 	return g
 }

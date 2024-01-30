@@ -4,6 +4,7 @@ import (
 	"sort"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	input "github.com/quasilyte/ebitengine-input"
 )
 
 type CameraDrawOptions struct {
@@ -18,6 +19,7 @@ type Camera struct {
 	W, H     float64
 	Z        float64
 	image    *ebiten.Image
+	input    *input.Handler
 	Target   Visual
 	sortNext bool
 }
@@ -55,16 +57,16 @@ func (c *Camera) Update() error {
 		p.Add(Vec2{s.X() / 2, s.Y() / 2})
 		c.Assign(p)
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyQ) {
+	if c.input.ActionIsPressed(InputRotateCameraLeft) {
 		c.Rotate(0.02)
 		c.sortNext = true
-	} else if ebiten.IsKeyPressed(ebiten.KeyE) {
+	} else if c.input.ActionIsPressed(InputRotateCameraRight) {
 		c.Rotate(-0.02)
 		c.sortNext = true
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyZ) {
+	if c.input.ActionIsPressed(InputZoomCameraOut) {
 		c.Z -= 0.01
-	} else if ebiten.IsKeyPressed(ebiten.KeyX) {
+	} else if c.input.ActionIsPressed(InputZoomCameraIn) {
 		c.Z += 0.01
 	}
 	return nil
