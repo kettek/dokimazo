@@ -92,6 +92,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func (g *Game) Update() error {
+	g.input.Update()
 	if err := g.world.Update(); err != nil {
 		return err
 	}
