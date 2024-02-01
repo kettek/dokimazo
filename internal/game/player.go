@@ -10,6 +10,7 @@ type Player struct {
 	*SpriteStack
 	Velocity Vec2
 	Inventory
+	Emotions
 	chunk *Chunk
 }
 
