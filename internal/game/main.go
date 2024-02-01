@@ -19,6 +19,10 @@ type Game struct {
 	input input.System
 
 	//
+	nightShader     *ebiten.Shader
+	nightShaderOpts ebiten.DrawRectShaderOptions
+
+	//
 	drawTargets DrawTargets
 	//
 	lastWidth, lastHeight int
@@ -38,6 +42,7 @@ const (
 )
 
 func New() *Game {
+	var err error
 	g := &Game{
 		camera: *NewCamera(),
 		world:  *NewWorld(),
@@ -75,6 +80,16 @@ func New() *Game {
 		InputZoomCameraOut:     {input.KeyX, input.KeyGamepadR2},
 	})
 
+	/*g.nightShader, err = res.LoadShader("night.kage")
+	if err != nil {
+		panic(err)
+	}
+	g.nightShaderOpts = ebiten.DrawRectShaderOptions{
+		Uniforms: map[string]interface{}{
+			"DayNight": 0.5,
+		},
+	}*/
+
 	return g
 }
 
@@ -97,6 +112,10 @@ func (g *Game) Update() error {
 		return err
 	}
 	g.camera.Update()
+
+	/*g.nightShaderOpts.Uniforms["Rotation"] = float32(g.camera.angle)
+	g.nightShaderOpts.Uniforms["Zoom"] = g.camera.Z
+	g.nightShaderOpts.Uniforms["Position"] = []float32{float32(g.camera.X()), float32(g.camera.Y())}*/
 
 	return nil
 }
@@ -145,8 +164,42 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.drawTargets.Sky.DrawRectShader(w, h, g.world.biosphere.cloudShader, &g.world.biosphere.cloudOpts)
 	}
 
+	// Darken the ground, drops, and world for nighttime.
+	// Calculate darkness with 0.4 to 0.6 to being broad daylight. 0.0 to 0.4 and 0.6 to 1.0 is night.
+	/*darkness := math.Max(0.3, 1.0-math.Abs(g.world.biosphere.daynight-0.5)*2)
+
+	// Get visible lights.
+	{
+		lights := make([]float32, 16*4)
+		if p := g.LocalPlayer(); p != nil {
+			x := p.Position().X()
+			y := p.Position().Y()
+			// x, y, radius, intensity
+			lights[0] = float32(x)
+			lights[1] = float32(y)
+			lights[2] = 100.0
+			lights[3] = 1.0
+			// rgba
+			lights[4] = 1.0
+			lights[5] = 1.0
+			lights[6] = 1.0
+			lights[7] = 1.0
+		}
+		g.nightShaderOpts.Uniforms["Lights"] = lights
+	}*/
+
+	/*g.nightShaderOpts.Images[0] = g.drawTargets.Ground
+	g.nightShaderOpts.Uniforms["DayNight"] = darkness
+	screen.DrawRectShader(g.drawTargets.Ground.Bounds().Dx(), g.drawTargets.Ground.Bounds().Dy(), g.nightShader, &g.nightShaderOpts)
+	g.nightShaderOpts.Images[0] = g.drawTargets.Drops
+	screen.DrawRectShader(g.drawTargets.Drops.Bounds().Dx(), g.drawTargets.Drops.Bounds().Dy(), g.nightShader, &g.nightShaderOpts)
+	g.nightShaderOpts.Images[0] = g.drawTargets.World
+	screen.DrawRectShader(g.drawTargets.World.Bounds().Dx(), g.drawTargets.World.Bounds().Dy(), g.nightShader, &g.nightShaderOpts)
+
+	g.nightShaderOpts.Images[0] = g.drawTargets.Sky
+	screen.DrawRectShader(g.drawTargets.Sky.Bounds().Dx(), g.drawTargets.Sky.Bounds().Dy(), g.nightShader, &g.nightShaderOpts)*/
+	// TODO: FOR NOW we're just drawing without lighting postprocessing.
 	screen.DrawImage(g.drawTargets.Ground, nil)
-	//screen.DrawImage(g.drawTargets.Shadow, nil)
 	screen.DrawImage(g.drawTargets.Drops, nil)
 	screen.DrawImage(g.drawTargets.World, nil)
 	screen.DrawImage(g.drawTargets.Sky, nil)

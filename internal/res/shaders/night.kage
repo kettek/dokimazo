@@ -1,0 +1,36 @@
+package main
+
+//kage:unit pixels
+
+var Position vec2
+var Zoom float
+var Rotation float
+
+var DayNight float
+var Lights [16]vec4
+
+func Fragment(dstPos vec4, srcPos vec2, color vec4) vec4 {
+  c := imageSrc0UnsafeAt(srcPos)
+
+  light := vec4(DayNight, DayNight, DayNight, DayNight)
+  
+  if c.a > 0.1 {
+    for i := 0; i < 16; i++ {
+      // light.xy = position, light.z = radius, light.w = intensity
+      lightPos := Lights[i].xy
+      lightRadius := Lights[i].z
+      lightIntensity := Lights[i].w
+      // Modify light intensity based on distance
+      lightIntensity *= 1.0 - clamp(distance(lightPos, srcPos) / lightRadius, 0.0, 1.0)
+      // Reduce lightIntensity based upon DayNight.
+      lightIntensity *= 1.0 - DayNight
+      // Adjust light based on intensity.
+      light = mix(light, Lights[i+1], lightIntensity)
+      i++
+    }
+  }
+  
+  c *= light
+
+  return c
+}

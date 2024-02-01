@@ -10,6 +10,7 @@ import (
 type CameraDrawOptions struct {
 	XOffset, YOffset float64
 	ShadowAngle      float64
+	ShadowAlpha      float64
 	HideVisuals      bool
 	Shadows          bool
 }
@@ -94,11 +95,12 @@ func (c *Camera) Draw(screen *ebiten.Image, visuals Visuals, opts CameraDrawOpti
 
 	c.image.Clear()
 	drawOpts := DrawOpts{
-		Image:      screen,
-		GeoM:       g,
-		Z:          c.Z,
-		Angle:      c.Angle(),
-		ExtraAngle: opts.ShadowAngle,
+		Image:       screen,
+		GeoM:        g,
+		Z:           c.Z,
+		Angle:       c.Angle(),
+		ExtraAngle:  opts.ShadowAngle,
+		ShadowAlpha: opts.ShadowAlpha,
 	}
 	if opts.Shadows {
 		for _, v := range visuals {
